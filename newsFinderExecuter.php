@@ -13,8 +13,10 @@ function fossbytesUrlTest(){
 
     $results = fossBytesFilteringArray($aPairs) ;
 
-var_dump ($results);
-}//test20191204_1520
+    //TODO -- Store values on DB
+    storeValuesDb($results);
+    return $results;
+}//FossBytes
 
 function fossBytesFilteringArray(array $pArrayToFilter){
     $filtredArr = [];
@@ -25,5 +27,14 @@ function fossBytesFilteringArray(array $pArrayToFilter){
     return $filtredArr;
 }
 
+    //TODO -- Create an CMD menu
+function menu(){
+    //escreve a lista de noticias
+    var_dump (fossbytesUrlTest());
+}
+//TODO -- Create an CMD menu
+function storeValuesDb(array $pArrayToStore){
+    //ter em atenção duplicados
+}
 
-fossbytesUrlTest();
+menu();
