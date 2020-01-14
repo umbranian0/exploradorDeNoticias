@@ -1,6 +1,7 @@
 <?php
 //wg2.php
 require_once "NewsFinder_V2.php";
+
 define("FOSSBYTES_URL", "https://fossbytes.com/");
 const FONTES_NOTICIAS_APP =["Fossbytes" ];
 function fossbytesUrlTest(){
@@ -29,24 +30,20 @@ function fossBytesFilteringArray(array $pArrayToFilter){
 }
 
     //TODO -- Create an CMD menu
-function execMenu(){
-    echo("1 -> Ver noticias atuais ". FONTES_NOTICIAS_APP ." /n
-    2 -> Pesquisar noticia por dia /n
-    3 -> Ver noticias HTML
-    4 -> sair");
+function menu($input){
+    $arrayNoticiasFossbytes = fossbytesUrlTest();
 
-    $input = readline("Command: ");
     //escreve a lista de noticias
     switch($input){
         case 1 :
-            var_dump (fossbytesUrlTest());
+            var_dump ($arrayNoticiasFossbytes);
             break;
         case 2:
             $inputSubMenu = readline("Data a pesquisar: ");
             pesquisarNoticiasDB_porDia($inputSubMenu);
             break;
         case 3:
-            verNoticiasHTML();
+            verNoticiasHTML($arrayNoticiasFossbytes);
             break;
         case 4:
             exit();
@@ -60,12 +57,33 @@ function storeValuesDb(array $pArrayToStore){
 }
 //TODO --Criar uma pesquisa na DB
 function pesquisarNoticiasDB_porDia(string $pSubMenuInput){
-
+    echo("todo");
 }
 //TODO --Criar e abrir um HTML no browser
-function verNoticiasHTML(){
+function verNoticiasHTML(array $pArrayNoticias){
+    $myFileName = NewsFinder_V2::dumpToHtml($pArrayNoticias);
+
+    $myfile = fopen($myFileName, "r") or die("Unable to open file!");
+    echo fread($myfile,filesize($myFileName));
+    fclose($myfile);
+
 
 }
 
+function execMenu(){
+    echo("
+    1 -> Ver noticias atuais Fossbytes \n
+    2 -> Pesquisar noticia por dia \n
+    3 -> Ver noticias HTML \n
+    4 -> sair \n");
+
+    $input = readline("Command: ");
+
+   if (input !== 4){
+       menu($input);
+       execMenu();
+   }//e
+
+}//execMenu
 
 execMenu();

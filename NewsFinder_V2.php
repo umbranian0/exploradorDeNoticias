@@ -48,4 +48,25 @@ class NewsFinder_V2{
         return $aPairsAnchorHref;
     }//allHyperlinksAtBoardUrl
 
+    //cria ficheiro html para os dados
+    public static function dumpToHtml(
+        $pLinks
+    ){
+        $ret = "<ol>";
+        foreach($pLinks as $link){
+            $anchor = $link["anchor"];
+            $href = $link["href"];
+            $str = sprintf("<li><a href='%s'>%s</a></li>".PHP_EOL, $anchor, $href);
+            $ret.=$str;
+        }
+        $ret .="</ol>";
+
+        if (!file_exists('htmlPresent.html'))
+        {
+            $handle = fopen('../htmlPresent.html','w+');
+            fwrite($handle,$ret);
+            fclose($handle);
+        }
+        return 'htmlPresent.html';
+    }//dumpToHtml
 }

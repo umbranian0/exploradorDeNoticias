@@ -134,21 +134,5 @@ class AmUtil{
         return $ret;
     }//getHyperlinksFromDOMFromSource
 
-    //cria ficheiro html para os dados
-    public function dumpToHtml(){
-        $html = "<html><body><table>";
 
-        foreach ($this->mDB->readAll() as $record){
-            $strContent = $record[MemorizadorGenerico::KEY_CONTENT];
-            $aParts = self::recordAsParts($strContent);
-            $url = $aParts["url"];
-            $local = $aParts["local"];
-            $line =
-                "<tr><td>$url</td><td><img width='480' src='$local'</td></tr>";
-            $html.=$line;
-        }//foreach
-
-        $html.="</table></body></html>";
-        file_put_contents("DB_DUMP.HTML", $html);
-    }//dumpToHtml
 }//AmUtil
