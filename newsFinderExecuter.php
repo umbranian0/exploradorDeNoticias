@@ -4,6 +4,7 @@ require_once "NewsFinder_V2.php";
 
 define("FOSSBYTES_URL", "https://fossbytes.com/");
 const FONTES_NOTICIAS_APP =["Fossbytes" ];
+
 function fossbytesUrlTest(){
 
     $FossBytesNewFinder = new NewsFinder_V2("news" , FOSSBYTES_URL);
@@ -13,23 +14,24 @@ function fossbytesUrlTest(){
     $aPairs = $FossBytesNewFinder->allHyperlinksAtBoardUrl($firstPage);
 
     $results = fossBytesFilteringArray($aPairs) ;
-    echo("A filtrar valores!");
     //TODO -- Store values on DB
     storeValuesDb($results);
-    echo("A retornar valores");
-    return $results;
+
+    //filtrar duplicados
+    return array_unique($results,SORT_REGULAR);
 }//FossBytes
 
 function fossBytesFilteringArray(array $pArrayToFilter){
     $filtredArr = [];
     foreach($pArrayToFilter as $item){
-        if(strlen($item["anchor"]) >= 40)
+        if(strlen($item["anchor"]) >= 40  ) {
             $filtredArr[] = $item;
+        }
     }
     return $filtredArr;
 }
 
-    //TODO -- Create an CMD menu
+    // -- Create an CMD menu
 function menu($input){
     $arrayNoticiasFossbytes = fossbytesUrlTest();
 
@@ -51,7 +53,7 @@ function menu($input){
     }
 
 }//execMenu
-//TODO -- Create an CMD menu
+//TODO -- Store Values DB
 function storeValuesDb(array $pArrayToStore){
     //ter em atenção duplicados
 }
@@ -59,14 +61,18 @@ function storeValuesDb(array $pArrayToStore){
 function pesquisarNoticiasDB_porDia(string $pSubMenuInput){
     echo("todo");
 }
-//TODO --Criar e abrir um HTML no browser
+// --Criar e abrir um HTML no browser
 function verNoticiasHTML(array $pArrayNoticias){
-    $myFileName = NewsFinder_V2::dumpToHtml($pArrayNoticias);
+    $myFileName = NewsFinder_V2::linksToHtml_retCaminhoFicheiro($pArrayNoticias);
 
     $myfile = fopen($myFileName, "r") or die("Unable to open file!");
-    echo fread($myfile,filesize($myFileName));
+    //echo fread($myfile,filesize($myFileName));
     fclose($myfile);
 
+    system(
+        "\"C:/Program Files/Mozilla Firefox/firefox.exe\" \"$myFileName\"",
+        $allOutput
+        );
 
 }
 
@@ -79,7 +85,7 @@ function execMenu(){
 
     $input = readline("Command: ");
 
-   if (input !== 4){
+   if ($input !== 4){
        menu($input);
        execMenu();
    }//e

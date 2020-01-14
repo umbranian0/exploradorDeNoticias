@@ -49,24 +49,41 @@ class NewsFinder_V2{
     }//allHyperlinksAtBoardUrl
 
     //cria ficheiro html para os dados
-    public static function dumpToHtml(
+    public static function linksToHtml_retCaminhoFicheiro(
         $pLinks
     ){
-        $ret = "<ol>";
+        //base HTML
+        $ret = "<!doctype html><html>
+        <head><meta charset='utf-8'>
+        <title>Noticiário</title>
+        <H3>Noticiário</H3>
+        </head><body>";
+
+
+        //criação do formato do HTML
+        $ret .= "<ol>";
         foreach($pLinks as $link){
             $anchor = $link["anchor"];
             $href = $link["href"];
-            $str = sprintf("<li><a href='%s'>%s</a></li>".PHP_EOL, $anchor, $href);
+           // $str = sprintf("<li><a anchor='%s'>%s</a></li>".PHP_EOL,  $href,$anchor);
+            $str = sprintf("<li><a href='$href'>%s</a></li> \n".PHP_EOL, $anchor, $href);
+
             $ret.=$str;
         }
         $ret .="</ol>";
+        $ret .="</body></html>";
 
-        if (!file_exists('htmlPresent.html'))
+        //criação do ficheiro
+        $nomeFicheiro = date('YmdHis').'_noticias.html';
+        $caminho = false ;
+        if (!file_exists($nomeFicheiro))
         {
-            $handle = fopen('../htmlPresent.html','w+');
+            $handle = fopen($nomeFicheiro,'w');
+            $caminho = realpath($nomeFicheiro);
             fwrite($handle,$ret);
             fclose($handle);
         }
-        return 'htmlPresent.html';
+
+        return $caminho;
     }//dumpToHtml
 }
