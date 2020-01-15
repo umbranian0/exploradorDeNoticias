@@ -59,7 +59,6 @@ class NewsFinder_V2{
         <H3>Noticiário</H3>
         </head><body>";
 
-
         //criação do formato do HTML
         $ret .= "<ol>";
         foreach($pLinks as $link){
