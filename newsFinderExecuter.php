@@ -43,15 +43,14 @@ function menu($input){
     //escreve a lista de noticias
     switch($input){
         case 1 :
-            var_dump ($arrayNoticiasFossbytes);
+            //var_dump ($arrayNoticiasFossbytes);
+            verNoticiasHTML($arrayNoticiasFossbytes);
             break;
-        case 4:
+        case 3:
             $inputSubMenu = readline("Data a pesquisar: ");
             pesquisarNoticiasDB_porDia($inputSubMenu);
             break;
-        case 3:
-            verNoticiasHTML($arrayNoticiasFossbytes);
-            break;
+
         case 2:
             $inputSubMenu = readline("URL a pesquisar: ");
             $arrayNoticias = pesquisarNoticiaFonteExterna($inputSubMenu);
@@ -136,8 +135,7 @@ function execMenu(){
     echo("
     1 -> Ver noticias atuais Fossbytes \n
     2 -> Pesquisar noticias em site externo (requere url) \n
-    3 -> Ver noticias HTML \n
-    4 -> Pesquisar noticia por dia \n
+    3 -> Pesquisar noticia por dia (requere dia das noticias)\n
     0 -> sair \n");
 
     $input = readline("Command: ");
