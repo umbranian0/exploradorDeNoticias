@@ -134,5 +134,50 @@ class AmUtil{
         return $ret;
     }//getHyperlinksFromDOMFromSource
 
+    public static function getCookiesFromWebUrl(string $pUrl){
+        //$cookiesArray = [];
+        $bIsValidUrl =  self::isValidHttpURL($pUrl);
 
+        if($bIsValidUrl){
+
+            $ch = curl_init('http://www.google.com/');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            // get headers too with this line
+            curl_setopt($ch, CURLOPT_HEADER, 1);
+            $result = curl_exec($ch);
+            // get cookie
+            // multi-cookie variant contributed by @Combuster in comments
+            preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $result, $matches);
+            $cookiesArray = array();
+            foreach($matches[1] as $item) {
+                parse_str($item, $cookie);
+                $cookiesArray = array_merge($cookiesArray, $cookie);
+            }
+        }
+        return $cookiesArray;
+    }//getCookiesFromWebUrl
+
+    public static function isValidHttpURL(string $pUrl){
+        if (strpos($pUrl, 'http') === 0) {
+            // It starts with 'http'
+        return true;
+        }
+        return false;
+    }//isValidHttpURL
+
+
+    public static function super_unique($array)
+    {
+        $result = array_map("unserialize", array_unique(array_map("serialize", $array)));
+
+        foreach ($result as $key => $value)
+        {
+            if ( is_array($value) )
+            {
+                $result[$key] = self::super_unique($value);
+            }
+        }
+
+        return $result;
+    }//super_unique
 }//AmUtil

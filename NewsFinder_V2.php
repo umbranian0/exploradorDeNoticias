@@ -65,6 +65,7 @@ class NewsFinder_V2{
             $anchor = $link["anchor"];
             $href = $link["href"];
            // $str = sprintf("<li><a anchor='%s'>%s</a></li>".PHP_EOL,  $href,$anchor);
+            if(strlen($anchor) > 0 )
             $str = sprintf("<li><a href='$href'>%s</a></li> \n".PHP_EOL, $anchor, $href);
 
             $ret.=$str;

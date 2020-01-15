@@ -1,11 +1,13 @@
 <?php
 //depandency
 require_once "NewsFinder_V2.php";
+require_once "AmUtil.php";
 //variables
 define("FOSSBYTES_URL", "https://fossbytes.com/");
 //const
 const FONTES_NOTICIAS_APP =["Fossbytes" ];
 const MOZZILA_PATH = "C:/Program Files/Mozilla Firefox/firefox.exe";
+
 const SUPPORTED_URL_FORMATS = [
     ".html", "news", ".aspx", ""
 ];
@@ -51,6 +53,11 @@ function menu($input){
             pesquisarNoticiasDB_porDia($inputSubMenu);
             break;
 
+        case 4:
+            $inputSubMenu = readline("URL a verificar: ");
+            $cookiesArrayToShow = AmUtil::getCookiesFromWebUrl($inputSubMenu);
+            var_dump($cookiesArrayToShow);
+            break;
         case 2:
             $inputSubMenu = readline("URL a pesquisar: ");
             $arrayNoticias = pesquisarNoticiaFonteExterna($inputSubMenu);
@@ -72,14 +79,16 @@ function menu($input){
 }//execMenu
 
 function pesquisarNoticiaFonteExterna(string $pUrlFonteExterna){
+    $bIsValidUrl =  AmUtil::isValidHttpURL($pUrlFonteExterna);
 
-    if (strpos($pUrlFonteExterna, 'http') === 0) {
+    if ($bIsValidUrl) {
         // It starts with 'http'
 
         $bHrefEndsInSupportedFormat = AmUtil::stringEndsInOneOfThese(
             AmUtil::HREF,
             SUPPORTED_URL_FORMATS
         );
+
         if($bHrefEndsInSupportedFormat){
             $NewsFinder = new NewsFinder_V2("news" , $pUrlFonteExterna);
             $aAllValidUrlsForTheBoard = $NewsFinder->allValidUrls();
@@ -90,7 +99,10 @@ function pesquisarNoticiaFonteExterna(string $pUrlFonteExterna){
             $results = verifyAnchorFilteringArray($aPairs) ;
 
             //filtrar duplicados
-            return array_unique($results,SORT_REGULAR);
+            $results = AmUtil::super_unique($results);
+
+
+            return $results;
         }
     }
     else{
@@ -136,6 +148,7 @@ function execMenu(){
     1 -> Ver noticias atuais Fossbytes \n
     2 -> Pesquisar noticias em site externo (requere url) \n
     3 -> Pesquisar noticia por dia (requere dia das noticias)\n
+    4 -> Ver cookies de site externo (requere url)\n
     0 -> sair \n");
 
     $input = readline("Command: ");
