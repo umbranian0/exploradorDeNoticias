@@ -65,7 +65,7 @@ function menu($input){
                     verNoticiasHTML($arrayNoticias);
             }
             break;
-        case 5:
+        case 0:
             exit();
             break;
     }
@@ -138,7 +138,7 @@ function execMenu(){
     2 -> Pesquisar noticias em site externo (requere url) \n
     3 -> Ver noticias HTML \n
     4 -> Pesquisar noticia por dia \n
-    5 -> sair \n");
+    0 -> sair \n");
 
     $input = readline("Command: ");
 
