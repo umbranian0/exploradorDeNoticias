@@ -7,8 +7,6 @@ class NewsFinder_V2{
     private $URL_BASE ;
     //constantes
 
-
-
     //construtor para a class de noticias
     public function __construct(
         string $pBoardName,
@@ -38,6 +36,76 @@ class NewsFinder_V2{
         return $aValidUrls;
     }//allValidUrls
 
+    // --Criar e abrir um HTML no browser
+    public static function verNoticiasHTML(array $pArrayNoticias){
+        $myFileName = self::linksToHtml_retCaminhoFicheiro($pArrayNoticias);
+
+        self::criarFicheiro($myFileName);
+
+    }//verNoticiasHTML
+
+    public function verifyAnchorFilteringArray(array $pArrayToFilter){
+        $filtredArr = [];
+        foreach($pArrayToFilter as $item){
+            if( strlen($item["anchor"]) >= 40  ) {
+                $filtredArr[] = $item;
+            }
+        }
+
+        return AmUtil::super_unique($filtredArr);
+    }//fossBytesFilteringArray
+
+    public static function criarFicheiro(string $pMyFileName){
+
+        $myfile = fopen($pMyFileName, "r");
+        //echo ("a tentar abrir ficheiro");
+        if( !file_exists($pMyFileName ))
+            echo ("Unable to open file!");
+        //echo fread($myfile,filesize($myFileName));
+        fclose($myfile);
+
+        //echo("a abrir HTML");
+        $browser_PATH = MOZZILA_PATH;
+        //abre o ficheiro com o browser
+        system(
+            "\"$browser_PATH\" \"$pMyFileName\"",
+            $allOutput
+        );
+    }//criarFicheiro
+
+    public static function pesquisarNoticiaFonteExterna(string $pUrlFonteExterna){
+
+        $bIsValidUrl =  AmUtil::isValidHttpURL($pUrlFonteExterna);
+
+        if ($bIsValidUrl) {
+            // It starts with 'http'
+            $bHrefEndsInSupportedFormat = AmUtil::stringEndsInOneOfThese(
+                AmUtil::HREF,
+                SUPPORTED_URL_FORMATS
+            );
+
+            if($bHrefEndsInSupportedFormat){
+                $NewsFinder = new NewsFinder_V2("news" , $pUrlFonteExterna);
+                $aAllValidUrlsForTheBoard = $NewsFinder->allValidUrls();
+
+                $firstPage = $aAllValidUrlsForTheBoard[0];
+                $aPairs = $NewsFinder->allHyperlinksAtBoardUrl($firstPage);
+
+                $results = $NewsFinder->verifyAnchorFilteringArray($aPairs) ;
+
+                //filtrar duplicados
+                $results = AmUtil::super_unique($results);
+
+
+                return $results;
+            }
+        }
+        else{
+
+            echo("unsupported URL!!");
+        }
+
+    }//pesquisarNoticiasFonteExterna
     public function allHyperlinksAtBoardUrl(
         string $pStrUrl
     ){
@@ -86,4 +154,6 @@ class NewsFinder_V2{
 
         return $caminho;
     }//dumpToHtml
+
+
 }

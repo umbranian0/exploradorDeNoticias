@@ -2,6 +2,7 @@
 //depandency
 require_once "NewsFinder_V2.php";
 require_once "AmUtil.php";
+require_once "ImageScrapper.php";
 //variables
 define("FOSSBYTES_URL", "https://fossbytes.com/");
 //const
@@ -20,23 +21,30 @@ function fossbytesUrlTest(){
     $firstPage = $aAllValidUrlsForTheBoard[0];
     $aPairs = $FossBytesNewFinder->allHyperlinksAtBoardUrl($firstPage);
 
-    $results = verifyAnchorFilteringArray($aPairs) ;
-    //TODO -- Store values on DB
-    storeValuesDb($results);
+    $results = $FossBytesNewFinder->verifyAnchorFilteringArray($aPairs);
 
     //filtrar duplicados
     return array_unique($results,SORT_REGULAR);
 }//FossBytes
 
-function verifyAnchorFilteringArray(array $pArrayToFilter){
-    $filtredArr = [];
-    foreach($pArrayToFilter as $item){
-        if(strlen($item["anchor"]) >= 40  ) {
-            $filtredArr[] = $item;
-        }
+
+
+function pesquisaFonteExterna($inputSubMenu){
+    $objFonteExterna = new NewsFinder_V2("ExternNews" , $inputSubMenu);
+    $arrayNoticias = $objFonteExterna->pesquisarNoticiaFonteExterna($inputSubMenu);;
+
+    $bControllArray = count($arrayNoticias) > 0;
+
+    if($bControllArray){
+        echo("Conseguimos tratar o pedido! \n ");
+        $inputQuest = readline("Deseja abrir no browser ? \n respostas possiveis (S / Sim | N / Nao ");
+        $inputQuest = strtoupper($inputQuest);
+        if($inputQuest === "SIM" || $inputQuest === "S" )
+            $objFonteExterna->verNoticiasHTML($arrayNoticias);
+        else
+            var_dump($arrayNoticias);
     }
-    return $filtredArr;
-}//fossBytesFilteringArray
+}//pesquisaFonteExterna
 
     // -- Create an CMD menu
 function menu($input){
@@ -44,110 +52,50 @@ function menu($input){
 
     //escreve a lista de noticias
     switch($input){
-        case 1 :
+            case 1 :
             //var_dump ($arrayNoticiasFossbytes);
-            verNoticiasHTML($arrayNoticiasFossbytes);
+            NewsFinder_V2::verNoticiasHTML($arrayNoticiasFossbytes);
             break;
-        case 3:
-            $inputSubMenu = readline("Data a pesquisar: ");
-            pesquisarNoticiasDB_porDia($inputSubMenu);
+            case 3:
+            $inputSubMenu = readline("URL a pesquisar: ");
+            pesquisaFonteExterna($inputSubMenu);
+            break;
+            case 2:
+                pesquisarImagensDeNoticiasDoDiaGoogle();
             break;
 
-        case 4:
+            case 4:
             $inputSubMenu = readline("URL a verificar: ");
             $cookiesArrayToShow = AmUtil::getCookiesFromWebUrl($inputSubMenu);
             var_dump($cookiesArrayToShow);
             break;
-        case 2:
-            $inputSubMenu = readline("URL a pesquisar: ");
-            $arrayNoticias = pesquisarNoticiaFonteExterna($inputSubMenu);
-            $bControllArray = count($arrayNoticias) > 0;
 
-            if($bControllArray){
-                echo("Conseguimos tratar o pedido! \n ");
-                $inputQuest = readline("Deseja abrir no browser ? \n respostas possiveis (S / Sim | N / Nao ");
-                $inputQuest = strtoupper($inputQuest);
-                if($inputQuest === "SIM" || $inputQuest === "S" || $inputQuest === "NAO" || $inputQuest === "N"  )
-                    verNoticiasHTML($arrayNoticias);
-            }
-            break;
-        case 0:
+            case 0:
             exit();
             break;
     }
 
 }//execMenu
 
-function pesquisarNoticiaFonteExterna(string $pUrlFonteExterna){
-    $bIsValidUrl =  AmUtil::isValidHttpURL($pUrlFonteExterna);
 
-    if ($bIsValidUrl) {
-        // It starts with 'http'
+//TODO -- Trazer 10 imagens de noticias do dia
+function pesquisarImagensDeNoticiasDoDiaGoogle(){
 
-        $bHrefEndsInSupportedFormat = AmUtil::stringEndsInOneOfThese(
-            AmUtil::HREF,
-            SUPPORTED_URL_FORMATS
-        );
+    $imgScrapper = new ImageScrapper();
+    $strUrl = $imgScrapper->urlForDay(date("D-M-Y"));
 
-        if($bHrefEndsInSupportedFormat){
-            $NewsFinder = new NewsFinder_V2("news" , $pUrlFonteExterna);
-            $aAllValidUrlsForTheBoard = $NewsFinder->allValidUrls();
+    NewsFinder_V2::criarFicheiro($strUrl);
 
-            $firstPage = $aAllValidUrlsForTheBoard[0];
-            $aPairs = $NewsFinder->allHyperlinksAtBoardUrl($firstPage);
-
-            $results = verifyAnchorFilteringArray($aPairs) ;
-
-            //filtrar duplicados
-            $results = AmUtil::super_unique($results);
-
-
-            return $results;
-        }
-    }
-    else{
-
-        echo("unsupported URL!!");
-    }
-
-}//pesquisarNoticiasFonteExterna
-
-//TODO -- Store Values DB
-function storeValuesDb(array $pArrayToStore){
-    //ter em atenção duplicados
 }//storeValuesDb
 
-//TODO --Criar uma pesquisa na DB
-function pesquisarNoticiasDB_porDia(string $pSubMenuInput){
-    echo("todo");
-}//pesquisarNoticiasDB_porDia
 
-// --Criar e abrir um HTML no browser
-function verNoticiasHTML(array $pArrayNoticias){
-    $myFileName = NewsFinder_V2::linksToHtml_retCaminhoFicheiro($pArrayNoticias);
 
-    $myfile = fopen($myFileName, "r");
-    //echo ("a tentar abrir ficheiro");
-    if( !file_exists($myFileName ))
-       echo ("Unable to open file!");
-    //echo fread($myfile,filesize($myFileName));
-    fclose($myfile);
-
-    //echo("a abrir HTML");
-    $browser_PATH = MOZZILA_PATH;
-    //abre o ficheiro com o browser
-    system(
-        "\"$browser_PATH\" \"$myFileName\"",
-        $allOutput
-        );
-
-}//verNoticiasHTML
 
 function execMenu(){
     echo("
     1 -> Ver noticias atuais Fossbytes \n
-    2 -> Pesquisar noticias em site externo (requere url) \n
-    3 -> Pesquisar noticia por dia (requere dia das noticias)\n
+    2 -> Pesquisar De Noticias Do Dia Google\n
+    3 -> Pesquisar noticias em site externo (requere url) \n
     4 -> Ver cookies de site externo (requere url)\n
     0 -> sair \n");
 

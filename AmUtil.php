@@ -166,18 +166,18 @@ class AmUtil{
     }//isValidHttpURL
 
 
-    public static function super_unique($array)
+    public static function super_unique($pArrayToFilter)
     {
-        $result = array_map("unserialize", array_unique(array_map("serialize", $array)));
+        $pArrayToFilter = array_unique($pArrayToFilter, SORT_REGULAR);
+        $filtredArr = [];
 
-        foreach ($result as $key => $value)
-        {
-            if ( is_array($value) )
-            {
-                $result[$key] = self::super_unique($value);
+        foreach($pArrayToFilter as $item){
+            $string = preg_replace('/\s+/', '', $item["anchor"]);
+            if( strlen($string) > 0  ) {
+                $filtredArr[] = $item;
             }
         }
 
-        return $result;
-    }//super_unique
+        return $filtredArr;
+  }//super_unique
 }//AmUtil

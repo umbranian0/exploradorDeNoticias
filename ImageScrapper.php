@@ -1,13 +1,11 @@
 <?php
-//NasaHelper.php
-//https://apod.nasa.gov/apod/ap950616.html
-//https://apod.nasa.gov/apod/ap191106.html
 
-class NasaHelper{
+class ImageScrapper
+{
     const MARK_IMG_START = "<IMG SRC=\"";
 
-    const APOD_URL_BASE = "https://apod.nasa.gov/apod/";
-    const APOD_URL_IMAGE_BASE = "https://apod.nasa.gov/";
+    const URL_BASE = "https://news.google.com/topics";
+    const URL_IMAGE_BASE = "https://news.google.com/topics";
 
     private $mTimeZone;
 
@@ -19,7 +17,7 @@ class NasaHelper{
             :
             $pTimeZone;
 
-        @date_default_timezone_set($this->mTimeZone);
+        date_default_timezone_set($this->mTimeZone);
     }//__construct
 
     /*
@@ -103,15 +101,15 @@ class NasaHelper{
         @$y = $myDate[self::KEY_YEAR]; //2018
         @$m = $myDate[self::KEY_MONTH]; //12
         @$d = $myDate[self::KEY_DAY]; //1
-        $strYear = self::auxIntToString($y, 2); //"18"
+        $strYear = self::auxIntToString($y, 4); //"18"
         $strMonth = self::auxIntToString($m, 2); //"12"
         $strDay = self::auxIntToString($d, 2); //"01"
         $url = sprintf(
-            "%sap%s%s%s.html",
-            self::APOD_URL_BASE,
-            $strYear,
+            "%s%s%s%s.html",
+            self::URL_BASE,
+            $strDay,
             $strMonth,
-            $strDay
+            $strYear
         );
         return $url;
     }//urlForDay
@@ -144,7 +142,7 @@ class NasaHelper{
             );
 
             //return $strImgRelativeUrl;
-            return self::APOD_URL_IMAGE_BASE.$strImgRelativeUrl;
+            return self::URL_IMAGE_BASE.$strImgRelativeUrl;
         }
         else{
             return false; //não há imagem na página em causa
@@ -170,34 +168,5 @@ class NasaHelper{
         //shell_exec("dump.jpg");
         shell_exec($strFilename);
     }//downloadAndDisplay
-}//NasaHelper
 
-$helper = new NasaHelper();
-/*
-//dyn
-$strUrl = $helper->urlForDay(); //https://apod.nasa.gov/apod/ap191106.html
-echo $strUrl;
-echo PHP_EOL;
-$strUrl = $helper->urlForDay(1999, 12, 25); //https://apod.nasa.gov/apod/ap191106.html
-echo $strUrl;
-echo PHP_EOL;
-
-//static
-//NasaHelper::urlForDay(2018, 12, 25); //...
-echo NasaHelper::auxIntToString(2019, 6);
-echo PHP_EOL;
-echo NasaHelper::auxIntToString(2019, 2);
-echo PHP_EOL;
-//echo $helper->getDirectUrlForIod(2019, 11, 5);
-
-$helper->downloadAndDisplay(2001, 10, 11);
-
-//shell("\"c:\\wp\\inet\\ffox\\firefox.exe\" \"https://arturmarques.com/edu/mad/\"");
-*/
-
-//FEIO, FEIO, FEIO, não há qq verificação
-
-$y = intval($argv[2]);
-$m = intval($argv[3]);
-$d = intval($argv[4]);
-$helper->downloadAndDisplay($y, $m, $d);
+}
