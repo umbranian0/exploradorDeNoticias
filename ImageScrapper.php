@@ -17,7 +17,7 @@ class ImageScrapper
             :
             $pTimeZone;
 
-        date_default_timezone_set($this->mTimeZone);
+        @date_default_timezone_set($this->mTimeZone);
     }//__construct
 
     /*
