@@ -6,6 +6,7 @@ class NewsFinder_V2{
     private $boardName;
     private $URL_BASE ;
     //constantes
+    private static $BROWSER_PATH  = "C:\Program Files (x86)\Google\Chrome\Application/chrome.exe";
 
     //construtor para a class de noticias
     public function __construct(
@@ -65,13 +66,17 @@ class NewsFinder_V2{
         fclose($myfile);
 
         //echo("a abrir HTML");
-        $browser_PATH = MOZZILA_PATH;
+        $browser_PATH = self::$BROWSER_PATH;
         //abre o ficheiro com o browser
         system(
             "\"$browser_PATH\" \"$pMyFileName\"",
             $allOutput
         );
     }//criarFicheiro
+
+public static function changeBrowserPath($pnewPath){
+       self::$BROWSER_PATH = $pnewPath;
+}
 
     public static function pesquisarNoticiaFonteExterna(string $pUrlFonteExterna){
 
