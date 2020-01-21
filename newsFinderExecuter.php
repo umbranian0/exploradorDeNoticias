@@ -7,7 +7,7 @@ require_once "ImageScrapper.php";
 define("FOSSBYTES_URL", "https://fossbytes.com/");
 //const
 const FONTES_NOTICIAS_APP =["Fossbytes" ];
-const MOZZILA_PATH = "C:/Program Files/Mozilla Firefox/firefox.exe";
+
 
 const SUPPORTED_URL_FORMATS = [
     ".html", "news", ".aspx", ""
@@ -69,7 +69,10 @@ function menu($input){
             $cookiesArrayToShow = AmUtil::getCookiesFromWebUrl($inputSubMenu);
             var_dump($cookiesArrayToShow);
             break;
-
+            case 5:
+                $inputSubMenu = readline("Novo Path: ");
+                NewsFinder_V2::changeBrowserPath($inputSubMenu);
+            break;
             case 0:
             exit();
             break;
@@ -97,6 +100,7 @@ function execMenu(){
     2 -> Pesquisar De Noticias Do Dia Google\n
     3 -> Pesquisar noticias em site externo (requere url) \n
     4 -> Ver cookies de site externo (requere url)\n
+    5 -> Modificar caminho do browser (requere PATH) \n
     0 -> sair \n");
 
     $input = readline("Command: ");
